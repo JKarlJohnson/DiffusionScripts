@@ -38,7 +38,7 @@ for num in num_runs:
 		# Averages mto data in each group and saves each batch in a seperate file
 		df_overall['t'] = df_overall['t']
 		overall_avgs = df_overall.groupby('t').mean()
-		overall_avgs.to_csv('ONEmto_block_{0}avg.csv'.format(k), ignore_index = True)
+		overall_avgs.to_csv('mto_block_{0}avg.csv'.format(k), ignore_index = True)
 		print('MTO {0} done'.format(k))
 
 # Diffusion coefficient calculation for each bin
@@ -47,7 +47,7 @@ diff_coeffs = []
 # calculate each diiffusion coefficient 
 for i in range(1, j+1):
 	
-	df_mtos = pd.read_csv('ONEmto_block_{0}avg.csv'.format(i))
+	df_mtos = pd.read_csv('mto_block_{0}avg.csv'.format(i))
 	df_mtos['total'] = df_mtos['x'] + df_mtos['y'] + df_mtos['z']
 	msdt_overall = df_mtos['total']/df_mtos['t']
 	D_intermed = np.mean(msdt_overall[-2500:])
@@ -63,7 +63,7 @@ d_avg_cm = (mean_diff * 10 ** 12) / (10 ** 16)
 d_stdev_cm = (stdev * 10 ** 12) / (10 ** 16)
 
 # Write out batch coefficients and overall average, standard deviation 
-with open('TWObatch_diffusivity_results.txt', 'w') as w:
+with open('batch_diffusivity_results.txt', 'w') as w:
 	w.write('Diffusion coefficients for 10 batches in angstroms squared per ps:\n')
 	for dif in diff_coeffs:
 		w.write('{0}\n'.format(dif))

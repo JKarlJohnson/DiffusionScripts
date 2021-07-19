@@ -64,7 +64,7 @@ d_stdev_cm = (stdev * 10 ** 12) / (10 ** 16)
 
 # Write out batch coefficients and overall average, standard deviation 
 with open('batch_diffusivity_results.txt', 'w') as w:
-	w.write('Diffusion coefficients for 10 batches in angstroms squared per ps:\n')
+	w.write('Diffusion coefficients for {0} batches in angstroms squared per ps:\n'.format(j+))
 	for dif in diff_coeffs:
 		w.write('{0}\n'.format(dif))
 

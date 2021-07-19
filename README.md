@@ -10,12 +10,12 @@ Takes a variable number of independent diffusion calculation as input, each stor
 
 Calculates self-diffusion coefficients in each direction (D_x, D_y, D_z) as well as the overall diffusion coefficient from a single file in the format outputted by msd_mto_each.py. Can be used with the overall file (msd_mto_all.csv), or the intermediate files produced within each independent run's folder (mto_dat.csv). Run script from the same folder as the msd file to read from. Writes out diffusion coefficients to file: directionalDiffusivity.txt in format:
 
-Diffusion Coefficients\n
-In units Angstroms^2/ps:\n
-x: Ds_x\n
-y: Ds_y\n
-z: Ds_z\n
-Total: Ds_tot\n\n
+\nDiffusion Coefficients  
+\nIn units Angstroms^2/ps:  
+\nx: Ds_x  
+\ny: Ds_y  
+\nz: Ds_z  
+\nTotal: Ds_tot  
 
 In units of cm^2/s:
 x: Ds_x_converted

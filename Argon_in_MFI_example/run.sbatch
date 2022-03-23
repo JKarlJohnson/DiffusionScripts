@@ -6,7 +6,7 @@
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=16
 #SBATCH --mail-type=END,FAIL
-#SBATCH --mail-user=jjw101@pitt.edu
+#SBATCH --mail-user="your email"
 #SBATCH --time=3-00:00:00
 
 

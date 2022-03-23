@@ -1,0 +1,86 @@
+# Initialization - Argon Diffusion in 2x2x4 MFI
+units		real
+boundary	p p p
+atom_style	full
+
+#Potential Description
+neighbor   	2.0 bin
+neigh_modify	every 1 delay 0 check yes
+pair_style	lj/cut 12.500
+pair_modify	tail yes mix arithmetic
+
+read_data	data.MFI_2x2x4 extra/atom/types 1
+
+# Setting up Argon to be inserted
+region	        box_Ar block 0 40.000 0 39.4000 0 52.50000
+molecule	Ar data.Ar offset 2 0 0 0 0
+fix             1 all deposit 100 0 1 723947 region box_Ar near 3.5 attempt 100 mol Ar
+
+#Set forcefield for Argon
+mass 3 39.9500 #Ar
+
+pair_coeff 3 3 0.24655 3.420 #Ar
+
+#create group to make rigid frmework
+group rigidMOF molecule 444
+velocity rigidMOF set 0.0 0.0 0.0
+fix zeroForce rigidMOF setforce 0.0 0.0 0.0
+
+# Molecule insertion
+timestep		0.5
+
+# Print trajectory (to print insertion trajectory, uncomment dump 1 and undump 1 lines)
+#dump		1 all custom 10 dump.ArInsertion.lammpstrj id mol type x y z xu yu zu
+fix		2 all nve
+thermo		10
+thermo_style	custom step atoms temp press ke pe etotal ecoul evdwl epair cpu
+run		5000
+# undump	1
+unfix 		2
+# End insertion
+#neigh_modify    exclude molecule/inter Argon # Use this line to exclude Ar-Ar interaction, simulating zero loading
+
+
+#equilibration, using NVT ensemble
+unfix           1
+reset_timestep  0
+group           Argon molecule > 444
+velocity	Argon create 298.0 12579
+
+# Print equilibration trajectory (to print trajectory, uncomment dump 2 and undump 2)
+#dump		2 all custom 1000 dump.Arequilibration.lammpstrj id mol type xu yu zu 
+#
+# Calculate temperature of argon only. Given the framework is held rigid, framework molecules have a temperature of zero
+# This means an average temperature across all atoms (as is default in LAMMPS) will be heavily skewed towards zero)
+compute         ArTemp Argon temp 
+fix 		3 Argon nvt temp 298.0 298.0 10.0 
+thermo		100
+thermo_style	custom step atoms c_ArTemp press ke pe etotal ecoul evdwl epair cpu
+run		100000
+#undump		2
+unfix 		3 
+# End Equilibration
+
+# Production, using NVE ensemble
+reset_timestep  0
+
+# Collect center of mass data for argon. COM of the argon mass can be used to calculate corrected diffusivty, without
+# the need for frequent trajectory dumps. This can save on storage space substantially. 
+compute         COM Argon com
+fix             COM_OUT Argon ave/time 100 1 100 c_COM[*] file COM mode vector 
+
+
+fix		2 Argon nve
+# Dump trajectories. Corrected diffusivity can also be calculated directly from the trajectory file of all argon atoms.
+# This dump can be used to validate the COM method for calculating self diffusivity. Otherwise, it is not necessary and 
+# will take up excessive disk space. To vizualize the system, this command can be used with a wider frequency. outputing
+# coordintes every 1000 or even 10000 steps can give a reasonable view of the system, without the high storage cost.
+dump		3 all custom 100 dump.Arproduction.lammpstrj id mol type xu yu zu
+
+# Calculate mean squared displacement via center-of-mass formalism, and print averaged results to a file
+# Mean squared displacement is used to calculate self diffusion coefficients. It is calculated internally in LAMMPS.
+compute		msd Argon msd com yes
+fix		msd Argon ave/time 100 1 100 c_msd[*] file msd mode vector
+run 1000000
+
+write_restart	restart.Ar_UiO-66_diffusion

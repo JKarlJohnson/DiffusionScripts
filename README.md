@@ -35,4 +35,8 @@ Ds batch n
 Average diffusion coefficient: Ds_avg  
 In cm^2/s: Ds_avg_converted  
 Standard Deviation: std(Ds_avg)  
-In cm^2/s: std(Ds_avg_converted)  
+In cm^2/s: std(Ds_avg_converted) 
+
+### CMSD_from_COM.py
+
+Given the time dependent center of mass data for the diffusing species, calculates the corrected diffusivity analog to self-diffusivities mean squared displacement (MSD). Can operate across any number of independent simulations, but expects each simulation to have the same length production run. Outputs a file, MSDC_COM in the style of LAMMPS MSD file inside the folder corresponding to each independent run. After successful use of this script, an identical procedure to that used for calculating self-diffusion coefficients can be used to produce corrected diffusivities here. Run msd_mto_each.py, replacing "msd" as the default input file with MSDC_COM. Also change the name of the ouput file(s) if you will also be collecting self-diffusvity data to avoid overwriting exisiting data. Then, run either diffusionCoefficient.py (for average diffusivity with directional data) or diffCoeffBlocked.py for average diffusivity and standard deviation across batches of independent runs.
